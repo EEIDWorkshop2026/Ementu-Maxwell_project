@@ -1,0 +1,31 @@
+##### Initiate populations  ####
+InitiatePop = function(IDs, initialInf_vec,totalPop_vec,beta_vec,gamma_vec){
+  list(
+    ID = IDs,
+    I = initialInf_vec,
+    S = totalPop_vec - initialInf_vec,
+    R = rep(0,length(initialInf_vec)),
+    beta = beta_vec,
+    gamma = gamma_vec,
+    kappa = kappa_vec,
+    nTotal = totalPop_vec,
+    frac_I = initialInf_vec/totalPop_vec
+  )
+}
+
+##### Epidemic functions: infection, recovery, loss of immunity  ####
+epidemic_timestep = function(HPop){
+  
+  for (i in 1:length(HPop$R)){
+    # Epidemic 
+    newly_infected = HPop$I[i] * HPop$S[i] * HPop$beta[i] / HPop$nTotal[i]
+    recovered_today_i= HPop$I[i] * HPop$gamma[i]
+    losing_immunity_today_i = HPop$R[i] * HPop$kappa[i]
+    
+    # Updating epidemic equations
+    HPop$S[i] = HPop$S[i] - newly_infected                     + losing_immunity_today_i
+    HPop$I[i] = HPop$I[i] + newly_infected - recovered_today_i
+    HPop$R[i] = HPop$R[i]                  + recovered_today_i - losing_immunity_today_i
+  }
+  HPop
+}
